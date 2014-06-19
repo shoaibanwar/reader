@@ -30,10 +30,14 @@ io.sockets.on('connection', function (socket){
 		});
 	});
 
-	socket.on('read', function (start, end) {			
-		options = { start:start, end: end }; 
-		console.log(start);
-		console.log(end);
+	socket.on('read', function (start, end) {
+		if(start == -1) { options = {buffetSize: end}; }		
+		else {			
+			options = { start:start, end: end }; 
+			log(start);
+			log(end);
+		}
+		
 
 		var stream = fs.createReadStream(fileName, options);
 		stream.on('data', function(data){

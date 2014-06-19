@@ -75,7 +75,7 @@ $(function(){
 		} 
 	    	else if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
 			innerContent = $('#content ch'); 			
-			start = getLast() + limit ;
+			start = getLast + limit ;
 			readMore(start); 
 			if(innerContent.length > contentLen) {innerContent.first().remove();}
 	    	}
