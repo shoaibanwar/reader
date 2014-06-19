@@ -11,7 +11,7 @@
 	<div id="main">
 		
 		<div id="controls">
-			<table width="100%"><tbody>
+			<table><tbody>
 			<tr><td align="right"><span id="info"></span></td></tr>
 			<tr><td align="right">
 			<span>Jump To: <select id="controleEl">

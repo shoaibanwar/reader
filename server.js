@@ -30,20 +30,25 @@ io.sockets.on('connection', function (socket){
 		});
 	});
 
-	socket.on('read', function (start, end) {			
-		options = { start:start, end: end }; 
-		console.log(start);
-		console.log(end);
+	socket.on('read', function (start, end) {
+		if(start == null || end == null){
+			log("wrong values received");
+		}else{		
+			options = { start:start, end: end,autoClose:false }; 
+			console.log(start);
+			console.log(end);
 
-		var stream = fs.createReadStream(fileName, options);
-		stream.on('data', function(data){
-			//sys.puts(data);
-			socket.emit('reading', data.toString('utf8').replace(/\n/g, '<br>'));
-		});	
+			var stream = fs.createReadStream(fileName, options);
+			stream.on('data', function(data){
+				//sys.puts(data);
+				//console.log(data.toString('utf8').replace(/\n/g, '<br>'));
+				socket.emit('reading', data.toString('utf8').replace(/\n/g, '<br>'));
+			});	
 
-		stream.on('end', function(){
-			socket.emit('endreading');
-		});
+			stream.on('end', function(){
+				socket.emit('endreading');
+			});
+		}
 	});
 
 });

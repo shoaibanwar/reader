@@ -1,6 +1,6 @@
 var socket = io.connect();
 var start = 0;
-var limit = 1048576; //1048576(1mb); 10240(10KB) //BYTES
+var limit = 65536; //1048576(1mb); 10240(10KB) //BYTES //65536
 var end = start+limit;
 var fileSize;
 var contentLen = 100;
@@ -10,16 +10,19 @@ socket.on('size', function (data){
 });
 
 socket.on('reading', function (data){
-  	//console.log(data);
+  	console.log(data);
 	innerContent = $('#content ch');
-	if(!innerContent.hasClass(start)){
-		if(start > Number(innerContent.last().attr('class'))){
+	//if(innerContent.hasClass(start)){
+		//$('#content .'+start).append(data);
+	//}else{
+		if(start >= Number(innerContent.last().attr('class'))){
 			$('#content').append('<ch class="'+start+'">'+data+'</ch>');
 		}
 		else{
 			$('#content').prepend('<ch class="'+start+'">'+data+'</ch>');
+			$('#content').scrollTop(60);
 		}		
-	}
+	//}
 	console.info(innerContent.length);
 	if(!innerContent.length)
 		calculateProgress(Number($('#content ch').attr('class')), Number($('#content ch').attr('class'))+limit);
@@ -40,7 +43,7 @@ calculateProgress = function(a, b){
 	console.info(a);
 	console.info(b);
 	console.info(fileSize)
-	$('#info').html("Displying Content in range of "+((a/fileSize)*100)+"% - "+((b/fileSize)*100)+"%");
+	$('#info').html("Displaying Content in range of <gr>"+((a/fileSize)*100).toPrecision(6)+"% - "+((b/fileSize)*100).toPrecision(6)+"%<gr>");
 }
 
 readMore = function(start){
@@ -49,6 +52,12 @@ readMore = function(start){
 	socket.emit('read', start, end);		
 }
 
+getFirst = function(){
+	if($('#content ch').length == 0)
+		return Number($('#content ch').attr('class'));
+	else
+		return Number($('#content ch').first().attr('class'));
+}
 
 getLast = function(){
 	if($('#content ch').length == 0)
@@ -65,12 +74,11 @@ $(function(){
 	$("#content").scroll(function() {
 		if($(this).scrollTop() == 0){
 			innerContent = $('#content ch');
-			start = innerContent.first().attr('class');
+			start = getFirst();
 			if(start != 0){ 
 				start = start - limit;
 				readMore(start); 
-				if(innerContent.length > contentLen) {innerContent.last().remove();}
-				$(this).scrollTop(60);
+				if(innerContent.length > contentLen) {innerContent.last().remove();}				
 			}
 		} 
 	    	else if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
@@ -83,6 +91,7 @@ $(function(){
 
 	$('#controleEl').change(function(){
 		start = Number(Number($(this).val())*fileSize/100);
+		console.info("jump start: "+start);
 		$('#content').html("");
 		readMore(start);
 

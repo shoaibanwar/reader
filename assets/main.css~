@@ -23,5 +23,5 @@
 }
 
 #info gr{
-	color:green;
+	font-color:green;
 }

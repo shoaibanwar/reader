@@ -30,18 +30,15 @@ io.sockets.on('connection', function (socket){
 		});
 	});
 
-	socket.on('read', function (start, end) {
-		if(start == -1) { options = {buffetSize: end}; }		
-		else {			
-			options = { start:start, end: end }; 
-			log(start);
-			log(end);
-		}
-		
+	socket.on('read', function (start, end) {			
+		options = { start:start, end: end,autoClose:false }; 
+		console.log(start);
+		console.log(end);
 
 		var stream = fs.createReadStream(fileName, options);
 		stream.on('data', function(data){
 			//sys.puts(data);
+			//console.log(data.toString('utf8').replace(/\n/g, '<br>'));
 			socket.emit('reading', data.toString('utf8').replace(/\n/g, '<br>'));
 		});	
 
