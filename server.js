@@ -23,9 +23,8 @@ io.sockets.on('connection', function (socket){
 	socket.on('size', function(){
 		fs.stat(fileName, function(err, stat) {
 		  if(err) {
-		    // handle error
-		  }
-		  console.log(stat.size); 
+		    	console.log("error in size");
+		  } 
 		  socket.emit('size', stat.size);   
 		});
 	});
@@ -35,18 +34,18 @@ io.sockets.on('connection', function (socket){
 			log("wrong values received");
 		}else{		
 			options = { start:start, end: end,autoClose:false }; 
-			console.log(start);
-			console.log(end);
-
 			var stream = fs.createReadStream(fileName, options);
 			stream.on('data', function(data){
 				//sys.puts(data);
-				//console.log(data.toString('utf8').replace(/\n/g, '<br>'));
 				socket.emit('reading', data.toString('utf8').replace(/\n/g, '<br>'));
+			});
+
+			stream.on('error',function(msg){
+				log('error on readstream:'+msg);
 			});	
 
 			stream.on('end', function(){
-				socket.emit('endreading');
+				log('endreading');
 			});
 		}
 	});

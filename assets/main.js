@@ -1,6 +1,6 @@
 var socket = io.connect();
 var start = 0;
-var limit = 65536; //1048576(1mb); 10240(10KB) //BYTES //65536
+var limit = 65536;
 var end = start+limit;
 var fileSize;
 var contentLen = 100;
@@ -10,20 +10,16 @@ socket.on('size', function (data){
 });
 
 socket.on('reading', function (data){
-  	console.log(data);
 	innerContent = $('#content ch');
-	//if(innerContent.hasClass(start)){
-		//$('#content .'+start).append(data);
-	//}else{
-		if(start >= Number(innerContent.last().attr('class'))){
-			$('#content').append('<ch class="'+start+'">'+data+'</ch>');
-		}
-		else{
-			$('#content').prepend('<ch class="'+start+'">'+data+'</ch>');
-			$('#content').scrollTop(60);
-		}		
-	//}
-	console.info(innerContent.length);
+
+	if(start >= Number(innerContent.last().attr('class'))){
+		$('#content').append('<ch class="'+start+'">'+data+'</ch>');
+	}
+	else{
+		$('#content').prepend('<ch class="'+start+'">'+data+'</ch>');
+		$('#content').scrollTop(60);
+	}		
+
 	if(!innerContent.length)
 		calculateProgress(Number($('#content ch').attr('class')), Number($('#content ch').attr('class'))+limit);
 	else
@@ -31,32 +27,29 @@ socket.on('reading', function (data){
 		
 });
 
-socket.on('endreading', function (){
-  	console.log('File completed');
-});
-
 socket.on('log', function (array){
   console.log.apply(console, array);
 });
 
 calculateProgress = function(a, b){
-	console.info(a);
-	console.info(b);
-	console.info(fileSize)
 	$('#info').html("Displaying Content in range of <gr>"+((a/fileSize)*100).toPrecision(6)+"% - "+((b/fileSize)*100).toPrecision(6)+"%<gr>");
 }
 
 readMore = function(start){
-	console.info("read more");
-	end = start + limit - 1;
-	socket.emit('read', start, end);		
+	if(!isNaN(start)){
+		end = start + limit - 1;
+		socket.emit('read', start, end);
+	}		
 }
 
-getFirst = function(){
+getFirst = function(){	
 	if($('#content ch').length == 0)
-		return Number($('#content ch').attr('class'));
+		var first = Number($('#content ch').attr('class'));
 	else
-		return Number($('#content ch').first().attr('class'));
+		var first = Number($('#content ch').first().attr('class'));
+	if(isNaN(first))
+		return false
+	return first;
 }
 
 getLast = function(){
@@ -74,11 +67,14 @@ $(function(){
 	$("#content").scroll(function() {
 		if($(this).scrollTop() == 0){
 			innerContent = $('#content ch');
-			start = getFirst();
-			if(start != 0){ 
-				start = start - limit;
-				readMore(start); 
-				if(innerContent.length > contentLen) {innerContent.last().remove();}				
+			//start = start || getFirst();
+			if(getFirst()){
+				start = getFirst()
+				if(start != 0){ 
+					start = start - limit;
+					readMore(start); 
+					if(innerContent.length > contentLen) {innerContent.last().remove();}				
+				}
 			}
 		} 
 	    	else if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
@@ -90,8 +86,7 @@ $(function(){
 	});
 
 	$('#controleEl').change(function(){
-		start = Number(Number($(this).val())*fileSize/100);
-		console.info("jump start: "+start);
+		start = parseInt(Number($(this).val())*fileSize/100);
 		$('#content').html("");
 		readMore(start);
 

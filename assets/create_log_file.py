@@ -1,8 +1,7 @@
 #!/usr/bin/python
 
 
-#end = 11000000
-end = 220000
+end = 11000000
 fo = open("log_file.txt", "w")
 
 print "Generating the log file will take a while. Please wait..."
