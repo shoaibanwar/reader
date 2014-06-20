@@ -8,10 +8,12 @@ Application reads large text file and display in the UI
 ## Prerequisites
 
 git
+
 Python
+
 Node.js
+
 socket.io
-Application may only run in chrome and firefox as sockets has been used which are not supported by IE
 
 ## Deployment
 
